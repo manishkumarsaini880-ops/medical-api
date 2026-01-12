@@ -99,6 +99,64 @@ app.get("/sales-report", async (req, res) => {
   }
 });
 
+// Today Sales
+app.get("/sales-today", async (req, res) => {
+  try {
+    const start = new Date();
+    start.setHours(0, 0, 0, 0);
+
+    const end = new Date();
+    end.setHours(23, 59, 59, 999);
+
+    const sales = await Sale.find({
+      createdAt: { $gte: start, $lte: end }
+    }).sort({ createdAt: -1 });
+
+    let totalAmount = 0;
+    sales.forEach(s => totalAmount += s.total);
+
+    res.json({
+      status: true,
+      totalBills: sales.length,
+      totalAmount: totalAmount,
+      sales: sales
+    });
+  } catch (e) {
+    res.json({ status: false, msg: "Failed to fetch today report" });
+  }
+});
+
+
+// Sales by Date Range
+app.post("/sales-by-date", async (req, res) => {
+  try {
+    const { from, to } = req.body;
+
+    const start = new Date(from);
+    start.setHours(0, 0, 0, 0);
+
+    const end = new Date(to);
+    end.setHours(23, 59, 59, 999);
+
+    const sales = await Sale.find({
+      createdAt: { $gte: start, $lte: end }
+    }).sort({ createdAt: -1 });
+
+    let totalAmount = 0;
+    sales.forEach(s => totalAmount += s.total);
+
+    res.json({
+      status: true,
+      totalBills: sales.length,
+      totalAmount: totalAmount,
+      sales: sales
+    });
+  } catch (e) {
+    res.json({ status: false, msg: "Failed to fetch date range report" });
+  }
+});
+
+
 
 
 
