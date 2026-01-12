@@ -12,10 +12,8 @@ const SaleSchema = new mongoose.Schema({
     }
   ],
   grandTotal: Number,
-  date: {
-    type: Date,
-    default: Date.now
-  }
+  },{ timestamps: true 
 });
 
 module.exports = mongoose.model("Sale", SaleSchema);
+
