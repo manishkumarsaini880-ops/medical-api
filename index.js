@@ -37,20 +37,40 @@ app.get("/get-medicine", async (req,res)=>{
   res.json(list);
 });
 
-// Add Sale (Billing)
 app.post("/add-sale", async (req, res) => {
   try {
-    console.log(req.body); // ye log bohot important h
-    
-    const sale = new Sale(req.body);
+    const saleData = req.body;
+
+    // 1. Save Sale
+    const sale = new Sale(saleData);
     await sale.save();
-    
-    res.json({ status: true, msg: "Bill Saved Successfully" });
+
+    // 2. Reduce Stock
+    for (let item of saleData.items) {
+      const medicine = await Medicine.findById(item.medicineId);
+
+      if (!medicine) {
+        return res.json({ status: false, msg: "Medicine not found" });
+      }
+
+      if (medicine.quantity < item.quantity) {
+        return res.json({
+          status: false,
+          msg: `Stock not enough for ${medicine.name}`,
+        });
+      }
+
+      medicine.quantity = medicine.quantity - item.quantity;
+      await medicine.save();
+    }
+
+    res.json({ status: true, msg: "Bill Saved & Stock Updated" });
   } catch (e) {
-    console.log(e); //error dikhega Render Logs me
+    console.log(e);
     res.json({ status: false, msg: "Billing Failed", error: e.message });
   }
 });
+
 
 // Get Sales (for reports later)
 app.get("/get-sales", async (req, res) => {
