@@ -2,6 +2,7 @@ const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
 const Medicine = require("./models/Medicine");
+const Sale = require("./models/Sale");
 
 const app = express();
 app.use(cors());
@@ -35,6 +36,25 @@ app.get("/get-medicine", async (req,res)=>{
   const list = await Medicine.find();
   res.json(list);
 });
+
+// Add Sale (Billing)
+app.post("/add-sale", async (req, res) => {
+  try {
+    const sale = new Sale(req.body);
+    await sale.save();
+    res.json({ status: true, msg: "Bill Saved Successfully" });
+  } catch (e) {
+    res.json({ status: false, msg: "Billing Failed" });
+  }
+});
+
+// Get Sales (for reports later)
+app.get("/get-sales", async (req, res) => {
+  const sales = await Sale.find().sort({ date: -1 });
+  res.json(sales);
+});
+
+
 
 app.delete("/delete-medicine/:id", async (req,res)=>{
   await Medicine.findByIdAndDelete(req.params.id);
