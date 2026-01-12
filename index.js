@@ -21,6 +21,16 @@ app.post("/add-medicine", async (req,res)=>{
   }
 });
 
+app.put("/update-medicine/:id", async (req, res) => {
+  try {
+    await Medicine.findByIdAndUpdate(req.params.id, req.body);
+    res.json({ status: true, msg: "Medicine Updated" });
+  } catch (e) {
+    res.json({ status: false, msg: "Update Failed" });
+  }
+});
+
+
 app.get("/get-medicine", async (req,res)=>{
   const list = await Medicine.find();
   res.json(list);
