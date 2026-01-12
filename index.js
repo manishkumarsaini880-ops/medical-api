@@ -40,11 +40,15 @@ app.get("/get-medicine", async (req,res)=>{
 // Add Sale (Billing)
 app.post("/add-sale", async (req, res) => {
   try {
+    console.log(req.body); // ye log bohot important h
+    
     const sale = new Sale(req.body);
     await sale.save();
+    
     res.json({ status: true, msg: "Bill Saved Successfully" });
   } catch (e) {
-    res.json({ status: false, msg: "Billing Failed" });
+    console.log(e); //error dikhega Render Logs me
+    res.json({ status: false, msg: "Billing Failed", error: e.message });
   }
 });
 
