@@ -78,6 +78,29 @@ app.get("/get-sales", async (req, res) => {
   res.json(sales);
 });
 
+// Sales report
+app.get("/sales-report", async (req, res) => {
+  try {
+    const sales = await Sale.find().sort({ createdAt: -1 });
+
+    let totalAmount = 0;
+    sales.forEach(s => {
+      totalAmount += s.total;
+    });
+
+    res.json({
+      status: true,
+      totalBills: sales.length,
+      totalAmount: totalAmount,
+      sales: sales
+    });
+  } catch (e) {
+    res.json({ status: false, msg: "Failed to fetch report" });
+  }
+});
+
+
+
 
 
 app.delete("/delete-medicine/:id", async (req,res)=>{
